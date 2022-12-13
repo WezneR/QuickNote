@@ -1,0 +1,85 @@
+\chapter{电子电路}
+
+\section{电源}
+
+    \subsection{同步Buck}
+    开关频率为$f_s$，则周期$T_s=\frac{1}{f_s}$，MTOP（同步Buck，上管称开关管，记MTOP，下管称续流管，记MBOT）导通时长为
+    \begin{equation}
+        T_\mathrm{on}=D\cdot\frac{1}{f_s}
+    \end{equation}
+    $D$为占空比。
+    电感开始储能，流过的电流增大，电感上电压左正（$V_\mathrm{in}$）右负（$V_\mathrm{out}$），伏秒积：
+    \begin{equation}
+        (V_\mathrm{in}-V_\mathrm{out})DT_s
+    \end{equation}
+    （伏秒积反映了电感中电流的增量。这是因为电感特性：电感电压等于感量乘以电流的时间变化率。）
+    其本质为流过的电流变化：
+    \begin{equation}
+        i_L(t)=i_L(0)+\frac{V_\mathrm{in}-V_\mathrm{out}}{L}t
+    \end{equation}
+    因此电流增量：
+    \begin{equation}
+        \Delta I_L=i_L(T_\mathrm{on})-i_L(0)=\frac{\left(V_\mathrm{in}-V_\mathrm{out}\right)D}{Lf_s}
+    \end{equation}
+    MTOP关断，MBOT导通时长为：
+    \begin{equation}
+        T_\mathrm{off}=(1-D)\cdot\frac{1}{f_s}
+    \end{equation}
+    电感向外输出电能，流过的电流逐渐减小，电感上电压左负（0）右正（$V_\mathrm{out}$），伏秒积：
+    \begin{equation}
+        V_\mathrm{out}(1-D)T_s
+    \end{equation}
+    在稳态下，电感上的电流纹波$\Delta I$，应该等于MTOP开通期间输出电流的增加量，也等于其关断期间输出电流的减小量。
+    所以开通和关断期间电感的伏秒积相等，
+    \begin{equation}
+        (V_\mathrm{in}-V_\mathrm{out})DT_s=V_\mathrm{out}(1-D)T_s
+    \end{equation}
+    可得：
+    \begin{equation}
+        D=\frac{V_\mathrm{out}}{V_\mathrm{in}}
+    \end{equation}
+    因此输出电流纹波：
+    \begin{equation}
+        \Delta I_L=\frac{\left(V_\mathrm{in}-V_\mathrm{out}\right)D}{Lf_s}=\frac{V_\mathrm{out}\left(1-\frac{V_\mathrm{out}}{V_\mathrm{in}}\right)}{Lf_s}
+    \end{equation}
+    \fbox{\makecell[{{p{16cm}}}]{由于输出电压的需求是确知的，开关频率由IC确定（为绕开汽车FM频段，一般固定在\SI{500}{\kilo\hertz}数量级或者大于2\si{\mega\hertz}），我们可以利用的结论通常总结为：输入电压越高，纹波越大；电感越大，纹波越小。}}
+
+    有了电流纹波，就可以据此计算电感参数。一般原则是电流纹波为输出电流$I_\mathrm{out}$的$20\% \sim 40\%$。取小主要受到空间成本、动态响应等方面的约束，取大主要受到电容耐受、负载端PSRR指标的约束。
+
+
+    个人观点：在负载为较高精度的模拟电路下，尽量选大电感加大耐压的电容，并做好负载IC的瞬态抑制和浪涌保护。
+
+
+    电感值选取：
+    \begin{equation}
+        L=\frac{V_\mathrm{out}\left(1-\frac{V_\mathrm{out}}{V_\mathrm{in,max}}\right)}{\Delta I f_s}
+    \end{equation}
+    取输入电压最大值就是为了考虑最坏情况——如果$\Delta I$最大，电路能满足要求，那么其他情况纹波只会更小，更能满足要求。
+
+
+    电感选取还要注意饱和电流的问题：铁氧体电感存在硬饱和、磁漏、体积大的问题，当电流超过一定值后电感感量急剧下降；一体成型的粉芯电感软饱和，但可能存在感值小、散热慢等问题。
+    通常取
+    \begin{equation}
+        I_{L(max)}=I_\mathrm{out}+0.5 \Delta I
+    \end{equation}
+    作为对电感饱和电流参数的标准。必须选择饱和电流比该值大的电感。
+    \begin{center}
+        （饱和电流常定义为使L下降额定值的30\%处的电流）
+    \end{center}
+
+
+    通过电流纹波计算电压纹波：
+    \begin{equation}
+        V_\mathrm{ripple}=\Delta I\left(\frac{1}{8f_sC_\mathrm{out}}+(ESR)_{C_\mathrm{out}}\right)
+    \end{equation}
+    输出电压纹波有容性分量和阻性分量，分别由输出滤波电容的容值（不足）和其ESR（过大）引起。
+
+    \subsection{PFC}
+    功率因数校正(Power Factor Correction, PFC)电路，用于防止用电器产生的杂波影响到电网。
+    
+    LG=logic ground 逻辑地，也是数字地
+    
+    
+    PE=power earth是电源地
+
+    FG是保护地，外壳接地

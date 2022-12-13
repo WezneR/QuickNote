@@ -1,0 +1,40 @@
+\contentsline {chapter}{\numberline {第一章\hspace {.3em}}线性代数}{3}{chapter.1}%
+\contentsline {section}{\numberline {1.1}矩阵空间}{3}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}Subspace 子空间}{3}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}Colummspace 列空间}{3}{subsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.1.3}Overdetermined Homogeneous Linear System}{4}{subsection.1.1.3}%
+\contentsline {section}{\numberline {1.2}方阵的特征值与特征向量}{4}{section.1.2}%
+\contentsline {section}{\numberline {1.3}奇异值分解}{5}{section.1.3}%
+\contentsline {chapter}{\numberline {第二章\hspace {.3em}}信号处理}{7}{chapter.2}%
+\contentsline {section}{\numberline {2.1}MUSIC算法}{7}{section.2.1}%
+\contentsline {section}{\numberline {2.2}统计信号处理的估计理论}{8}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}参数估计的数学模型}{8}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}估计量的性能}{9}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}估计量的最小均方误差准则}{12}{subsection.2.2.3}%
+\contentsline {subsubsection}{MVU估计量的存在性}{12}{subsubsection*.2}%
+\contentsline {subsubsection}{MVU估计量的求法}{12}{subsubsection*.3}%
+\contentsline {subsection}{\numberline {2.2.4}Cramer-Rao 下限}{13}{subsection.2.2.4}%
+\contentsline {subsubsection}{关于参数估计的精度的考虑}{13}{subsubsection*.4}%
+\contentsline {subsubsection}{CRLB定理}{14}{subsubsection*.5}%
+\contentsline {chapter}{\numberline {第三章\hspace {.3em}}深度学习}{17}{chapter.3}%
+\contentsline {section}{\numberline {3.1}数据处理}{17}{section.3.1}%
+\contentsline {section}{\numberline {3.2}模型设计}{19}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}多层感知机}{19}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}卷积神经网络}{19}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}训练配置}{19}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}反向传播}{19}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}特征标准化}{19}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}模型保存}{20}{section.3.4}%
+\contentsline {section}{\numberline {3.5}模型预测}{20}{section.3.5}%
+\contentsline {chapter}{\numberline {第四章\hspace {.3em}}通信原理}{21}{chapter.4}%
+\contentsline {section}{\numberline {4.1}数字频带传输}{21}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}二进制通断键控(On-Off Keying)/二进制幅度键控(2ASK)}{21}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}二进制相移键控(2PSK)}{22}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}二进制差分相移键控(2DPSK)}{23}{subsection.4.1.3}%
+\contentsline {section}{\numberline {4.2}移动通讯}{23}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}5G}{23}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}6G}{23}{subsection.4.2.2}%
+\contentsline {chapter}{\numberline {第五章\hspace {.3em}}电子电路}{25}{chapter.5}%
+\contentsline {section}{\numberline {5.1}电源}{25}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}同步Buck}{25}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}PFC}{26}{subsection.5.1.2}%

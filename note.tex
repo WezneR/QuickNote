@@ -1,0 +1,214 @@
+\documentclass{ctexbook}
+\setCJKmainfont{SimSun}[AutoFakeBold,AutoFakeSlant]
+
+%%%%%%%%%%%%% Geometry
+\usepackage[a4paper,left=2.5cm,right=2.5cm, bottom=2.5cm,top=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{xeCJK} %中日韩文字xeCJK宏包
+\usepackage{indentfirst} %设置段首缩进的宏包
+\usepackage{cases}%提供了numcases
+\usepackage{siunitx}
+% \usepackage{extarrows}%提供了\xlongequal 应用
+\usepackage{bm}%提供了数学粗体
+\usepackage{graphicx}
+\usepackage{mathrsfs} %提供了\mathscr
+\usepackage{ulem}%提供了\uline{加下划线}而\uwave{加波浪线}则是在文本下面加上波浪线。\sout{中间加横线}
+\usepackage{cancel}%提供了划去公式\cancel \bcancel \xcancel \cancelto{新公式}{原公式}
+\usepackage{xcolor}
+\usepackage{makecell}
+
+\usepackage{listings}
+\lstset{
+    language=Python,
+%     % backgroundcolor=\color{blue!10!gray},%代码块背景色为浅灰色
+% %	rulesepcolor= \color{gray}, %代码块边框颜色
+% 	breaklines=true,  %代码过长则换行
+	numbers=left, %行号在左侧显示
+	% numberstyle= \small,%行号字体
+% 	commentstyle=\color{gray}, %注释颜色
+% 	frame=shadowbox%用方框框住代码块
+% 	% frame=single，
+% 	escapeinside=``    % 代码包含中文
+%     rulesepcolor=\color{red!20!green!20!blue!20},%代码块边框为淡青色
+%     %========= 关键字
+%     basicstyle = \zihao{-6}\ttfamily,
+    numberstyle = \zihao{-6}\ttfamily,
+%     commentstyle = \color{green!40!black}\ttfamily,
+%     keywordstyle = \color{blue},
+%     keywordstyle = [2]\color{teal},
+%     stringstyle = \color{magenta},
+%     showstringspaces=false,%不显示代码字符串中间的空格标记
+%     stringstyle=\ttfamily, % 代码字符串的特殊格式
+%     %========= 缩进
+%     keepspaces=true, %
+%     breakindent=22pt, %
+%     tabsize=4, %
+%     %========
+}
+\usepackage{pythonhighlight}
+
+\usepackage[verbose]{hyperref}
+
+\hypersetup{ 
+    hidelinks,
+    % dvipdfm, % already been used
+    pdfstartview=FitH,
+    CJKbookmarks=true,
+    bookmarksnumbered=true,
+    bookmarksopen=true,
+    bookmarksopenlevel=0,
+    breaklinks=true,
+    % colorlinks=true, %注释掉此项则交叉引用为彩色边框(将colorlinks和pdfborder同时注释掉)
+    % pdfborder=001,   %注释掉此项则交叉引用为彩色边框
+    citecolor=magenta,% magenta洋红 , cyan青色
+    linkcolor=blue,
+    citecolor=red,
+    linkcolor=cyan,
+    %linktocpage=true,
+    % hyperfootnotes=true, % already been used
+    % hyperindex=true, % already been used
+}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{arrows,shapes}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{tikzmark}
+\usetikzlibrary{matrix}
+\usetikzlibrary{shapes.misc}
+
+\usepackage{pgfplots}
+
+\usepackage[breakable]{tcolorbox}%提供了\colorbox
+\tcbuselibrary{skins, breakable, theorems}
+
+\definecolor{tcb_main}{HTML}{5989cf}    % setting main color to be used
+\definecolor{tcb_sub}{HTML}{cde4ff}     % setting sub color to be used
+\definecolor{tcbproof_main}{rgb}{0.16, 0.28, 0.39}     % setting sub color to be used
+
+\newtcbtheorem{question}{题~(理}
+    {enhanced,
+     breakable,
+     colback = white,
+     colframe = cyan,
+     colbacktitle = cyan,
+     fonttitle = \sffamily\bfseries,
+     attach boxed title to top left = {yshift = -2mm, xshift = 5mm},
+     boxed title style = {sharp corners},
+     separator sign = {).~}
+    }{qst}
+
+\newtcbtheorem[number within=chapter]{definition}{定义}
+    {fonttitle=\bfseries\upshape,
+     fontupper=\slshape,
+     colback=red!5!white,
+     colframe=red!75!black!70!yellow,
+     arc=0mm,
+    }{def}
+\newtcbtheorem[number within=chapter]{theorem}{定理}
+    {fonttitle=\bfseries\upshape,
+     fontupper=\slshape,
+     colback=blue!5!white,
+     colframe=tcb_main,
+     arc=0mm,
+    }{theo}
+\newtcbtheorem[number within=chapter]{corollary}{推论}
+    {fonttitle=\bfseries\upshape,
+     fontupper=\slshape,
+     colback=blue!5!white,
+     colframe=tcb_main,
+     arc=0mm,
+    }{coro}
+\newtcbtheorem[number within=chapter]{lemma}{引理}
+    {fonttitle=\bfseries\upshape,
+     fontupper=\slshape,
+     colback=blue!5!white,
+     colframe=gray!60!blue,
+     arc=0mm,
+    }{lemm}
+\newtcbtheorem[number within=chapter]{example}{例}% 例题主题样式
+    {
+    fonttitle=\bfseries\upshape,
+    % fontupper=\slshape,
+    colback=tcbproof_main!5!white,
+    colframe=tcbproof_main,
+    % arc=0mm,
+    subtitle style={boxrule=0.4pt,
+    colback=tcbproof_main!70!gray},
+    breakable,
+    }{exam}
+\newtcolorbox{tcbproof}% 证明主题样式
+    {
+    sharp corners,
+    colback = tcbproof_main!5!white,
+    colframe = tcbproof_main,
+    boxrule = 0pt,
+    leftrule = 5pt % left rule weight
+    }
+\newtcolorbox{tcbdef}[1]% 样式与定义主题相同，但不作为定义环境
+    {
+    title=#1,
+    fonttitle=\bfseries\upshape,
+    fontupper=\slshape,
+    colback=red!5!white,
+    colframe=red!75!black!70!yellow,
+    arc=0mm,
+    }
+\newtcolorbox{tcbnote}% 注释主题样式
+    {
+    title=\hbox{\tikz[baseline=-3.8pt]\node[circle,fill=white,inner sep=.2pt]{\color{orange} \textbf{!}}; 注意},
+    fonttitle=\bfseries\upshape,
+    fontupper=\slshape,
+    colback=orange!10!white!95!yellow,
+    colframe=orange!89!gray!85!yellow,
+    arc=0mm,
+    }
+
+% \usepackage{enumerate}
+\usepackage{enumitem}%提供了中文编号的enumerate环境
+\AddEnumerateCounter{\chinese}{\chinese}{}
+\usepackage{wrapfig}
+
+% % Commands for Highlighting text -- non tikz method
+\newcommand{\highlight}[2]{\colorbox{#1!17}{$\displaystyle #2$}}
+% \newcommand{\highlight}[2]{\colorbox{#1!17}{$#2$}}
+% \newcommand{\highlightdark}[2]{\colorbox{#1!47}{$\displaystyle #2$}}
+
+% % Commands for Highlighting text -- non tikz method
+\renewcommand{\highlight}[2]{\colorbox{#1!17}{#2}}
+% \renewcommand{\highlightdark}[2]{\colorbox{#1!47}{#2}}
+
+\setlength{\parindent}{2\ccwd}  %\parindent表示段首缩进的长度，设置为两个大写字母M的长度
+
+%% 设置罗马数字
+\makeatletter
+\newcommand{\rmnum}[1]{\romannumeral #1}
+\newcommand{\Rmnum}[1]{\expandafter\@slowromancap\romannumeral #1@}
+\makeatother
+\renewcommand{\Re}{\operatorname{Re}} % Fraktur 体的字母“R”和“I”，改为国标要求使用罗马体的“Re”和“Im”，
+\renewcommand{\Im}{\operatorname{Im}}
+
+\begin{document}
+
+\tableofcontents
+
+\include{LinearAlgebra}
+
+\include{SignalProcessing}
+
+
+% \chapter{数字图像}
+
+% \section{目标跟踪}
+%     卷积操作：$h$为相关核(correlation kernel)，尺寸为$K\times L$：
+%     \begin{equation}
+%         f(m,n)\circ h(m,n)=\sum_{i=0}^{M-1} \sum_{j=0}^{N-1} f(i,j) h(m+i,n+j)
+%     \end{equation}
+
+\include{DeepLearning}
+
+\include{Communication}
+
+\include{Electric}
+
+\end{document}

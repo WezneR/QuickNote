@@ -1,0 +1,454 @@
+\chapter{信号处理}
+
+\section{MUSIC算法}
+    设有远场区信号源$X_1,X_2\in \mathbb{C}$，其中信号$X_i,\,i=1,2$ 到达 $N_a=3$ 的ULA，由阵元间距$d$和入射角$\theta_i$引起的相位差为$\phi_i$，则
+    \begin{equation}
+        \phi_i=\frac{2 \pi}{\lambda}d\cos\theta_i=2 \pi f\frac{d\cos\theta_i}{c}
+    \end{equation}
+    为计算方便，把这个相邻阵元接收信号的相位差用复数表示：
+    \begin{equation}
+        \varPhi_i=\mathrm{e}^{\mathrm{j}\phi_i}
+    \end{equation}
+    设$\gamma_i\in \mathbb{C}$表示信源$i$传播到ULA的参考阵元（通常就取第一个阵元）的过程中引起的幅值和相位的变化，设阵元$j$处收到的信号为$Y_j$，则
+    \begin{equation}
+        Y_j=\gamma_1 X_1 \varPhi_1^{(j-1)} + \gamma_2 X_2 \varPhi_2^{(j-1)} \quad j=1,\cdots,N_a=3
+    \end{equation}
+    注意，$Y_j$和$X_i$本身都是时域信号的采样点，因此是向量的形式。
+
+    写成矩阵形式：
+    \begin{equation}\label{Equ: rx of ULA}
+         \tikzmarknode{Y}{\highlight{red}{$\displaystyle \begin{bmatrix}Y_1\\Y_2\\Y_3\end{bmatrix}$}}
+         =\tikzmarknode{X}{\highlight{blue}{$\begin{bmatrix}1 &1\\\varPhi_1 &\varPhi_2\\\varPhi_1^2 &\varPhi_2^2\\\end{bmatrix}$}}
+         \begin{bmatrix}
+            \gamma_1 X_1\\
+            \gamma_2 X_2
+        \end{bmatrix}
+    \end{equation}
+    \begin{tikzpicture}[overlay,remember picture,>=stealth,nodes={align=left,inner ysep=1pt},<-]
+    \path (Y.south) ++ (0,-1em) node[anchor=north east,color=red!67] (annotation1){$\bm{Y}$\textbf{矩阵}};
+    \draw [color=red!57](Y.south) |- ([xshift=-0.3ex,color=red]annotation1.south west);
+    \path (X.south) ++(0,-1em) node[anchor=north west,color=blue!67] (annotation2){$\bm{\varPhi}$\textbf{矩阵}};
+    \draw [color=blue!57](X.south) |- ([xshift=-0.3ex,color=blue]annotation2.south east);
+    \end{tikzpicture}
+    \vspace{1cm}
+
+    在实际问题中，往往已知$\bm{Y}$，而信源和传播路径未知，要由此直接解出$\bm{\varPhi}$似乎不可能。
+
+    回想一下学过的数学知识，在满足什么样的条件时，我们可以仅通过一个已知量$b$，就确定方程
+    \begin{equation*}
+        k_1 x_1 + k_2 x_2 = b
+    \end{equation*}
+    的参数$k$呢？
+
+    在线性代数里，如果两个向量线性无关，那么这两个向量按任意不全为零的系数$k_1,k_2$加权求和都不可能得到零向量。
+
+    因此，如果这里$b$是零向量，而$x_1,x_2$满足线性无关时，就只有$k_1=k_2=0$能满足原方程。换言之，在涉及线性无关向量组的运算中，如果把方程整理（或寻找一种变换）使等式右边为0，左边为线性无关向量做 linear combanation 的形式，那么就必然得出加权系数为0的结论。
+
+    受以上启发，我们对问题增加新的限制条件：\textbf{各个信源信号彼此是线性无关的}。则此处$\gamma X_1$和$\gamma X_2$线性无关。对\hyperref[Equ: rx of ULA]{式(\ref*{Equ: rx of ULA})}两边左乘加权系数向量$\bm{C}\in \mathbb{C}^{N_a}$：
+    \begin{equation}
+            c_1Y_1+c_2Y_2+c_3Y_3
+        =
+        \begin{bmatrix}
+            c_1 &c_2 &c_3
+        \end{bmatrix}
+        \begin{bmatrix}1 &1\\\varPhi_1 &\varPhi_2\\\varPhi_1^2 &\varPhi_2^2\\\end{bmatrix}
+        \begin{bmatrix}
+            \gamma_1 X_1\\
+            \gamma_2 X_2
+        \end{bmatrix}
+    \end{equation}
+
+    我们需要找到合适的$\bm{C}\neq 0$，使$\bm{C}\bm{Y}=0$。如果这样的$\bm{C}$存在，那么加权系数向量$\bm{C}\bm{\varPhi}$就是零向量，进而求出$\bm{\varPhi}$。
+
+    那么这样的$\bm{C}$存不存在呢？事实上，由于天线数量$N_a$大于信源数量，即$\bm{\varPhi}$的行数大于列数，因此矩阵$\bm{Y}=\bm{\varPhi}\bm{X}$的秩一定不大于$\bm{\varPhi}$的列数。即$\mathrm{R}(Y)\leqslant \min\{\mathrm{R}(\bm{\varPhi}),\mathrm{R}(\bm{X})\}\leqslant 2$。\footnote[1]{$\bm{\varPhi}$可以看作是范德蒙矩阵的一部分，此处只要$\theta_1\neq\theta_2$则$\bm{\varPhi}$ 就是列满秩的；而由于线性无关所以 $\bm{X}$行满秩，因此它们乘积的秩一般而言为2，即信源个数。}  因此矩阵$\bm{Y}$行降秩，所以$Y_1,Y_2,Y_3$必然是线性相关的，存在不全为零的系数$c_1,c_2,c_3$，使
+    \begin{equation*}
+        c_1Y_1+c_2Y_2+c_3Y_3=0
+    \end{equation*}
+
+    对于有$N_s$个采样点的接收信号组成的矩阵$\bm{Y}_{N_s\times 3}$，如何求解$\bm{C}\bm{Y}=0$？显然，该方程
+    \begin{equation}
+        \begin{bmatrix}
+            Y_1[1] &Y_2[1] &Y_3[1]\\
+            Y_1[2] &Y_2[2] &Y_3[2]\\
+            \vdots &\vdots &\vdots\\
+            Y_1[N_s] &Y_2[N_s] &Y_3[N_s]
+        \end{bmatrix}
+        \begin{bmatrix}
+            c_1\\ c_2\\ c_3
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0\\
+            0\\
+            \vdots \\
+            0
+        \end{bmatrix}
+    \end{equation}
+    是关于$\bm{C}$的超定(\emph{overdetermined})方程组，而且还是齐次(\emph{homogenous})的。
+
+    超定方程组通常无解，我们只能得到近似解，并选取一个量化误差的指标使近似解最优。最常的指标是平方和（或者欧氏距离），这种求近似解的方法就是\textbf{最小二乘法}。
+
+
+    % 对于
+    % \begin{equation}
+    %     \begin{bmatrix}
+    %         y_1(1) &y_1(2) &\cdots &y_1(N)\\
+    %         y_2(1) &y_2(2) &\cdots &y_2(N)\\
+    %         y_3(1) &y_3(2) &\cdots &y_3(N)
+    %     \end{bmatrix}
+    %     =
+    % \end{equation}\left\lfloor  \right\rceil 
+\section{统计信号处理的估计理论}
+    本章节介绍从含有随机性的时间序列（以下简称随机信号）中提取未知参数的问题。
+    \subsection{参数估计的数学模型}
+        几乎任何来自物理世界的的数据都具有随机性，一组时间序列可以看作是参数服从特定分布的随机过程$\bm{\mathrm{x}}$的一个实现,记作$\bm{x}$。为了简化问题，通常认为随机过程$\bm{\mathrm{x}}$是\emph{各态历经}(Ergodic)的，即随机过程中的任何一个样本函数$\bm{x}$都含有随机过程的全部统计信息。
+
+        通常问题为：需要通过观测到的随机信号$\bm{x}$来估计$\mathrm{\bm{x}}$的某个或某些参数，参数用向量$\bm{\theta}$表示。
+
+        为了得到更优的估计，我们应确定一个合适的\emph{估计量}(Estimator)，记作$\hat{\bm{\theta}}$，它是关于样本数据的函数，并应当充分利用样本的信息。
+
+        至此，问题描述为：随机信号$\bm{x}$服从参数为$\bm{\theta}$的某分布，已知$\bm{x}$的样本$[x(0),\,x(1),$ $\,\cdots,\,x(N-1);\bm{\theta}]$，求尽可能\footnote[2]{我们希望估计量越接近真值越好，但怎样评估估计量的性能，以得到最适合当前问题的估计量，这个问题将在下一节讨论。}接近真值$\bm{\theta}$的估计量$\hat{\bm{\theta}}$。
+
+        求解参数估计问题的两个关键：
+        \begin{enumerate}
+            \item 对随机信号$\bm{x}$建模。对$\bm{x}$的分布类型提出一个合理的假设，即得出$\bm{x}$服从的PDF。模型的选取要求其既方便数学推导出闭合形式的估计量，又贴合实际问题。
+            \item 确定最佳/准最佳估计量。估计量$\hat{\bm{\theta}}$通常是关于样本数据和其他已知参数的函数，它应当按你所希望的方式接近其真值$\bm{\theta}$。
+        \end{enumerate}
+
+        对于第一个问题，通常有两种方式得出随机信号的PDF。
+
+        经典方法是认为参数$\bm{\theta}$是一组确定的未知数。
+        与之相对的是\emph{贝叶斯(Bayesian)估计}，认为参数本身是服从某种分布（需要依据先验知识假定，例如均匀分布）的随机变量，因此它具有先验PDF。
+        这里用两个例子说明之。
+
+        \begin{example}{服从正态分布的单随机变量均值估计概率模型}{服从正态分布的单变量均值估计概率模型}
+            对于长度为1的随机信号$\bm{x}=x(0)$，其值服从方差为$\sigma^2$的正态分布，现需要估计其均值。求随机信号$\bm{x}$的PDF。
+            \tcbsubtitle{解：}
+            \setlength{\parindent}{2\ccwd}
+            在经典方法中，认为分布的参数是未知的确定量，因此这里无论是估计均值还是估计方差，或者两者，都不影响PDF的形式——把所有参数当做已知量即可。PDF为
+            \begin{equation}
+                p(\bm{x};\bm{\theta})=p(x(0);\theta)=\frac{1}{\sqrt{2 \pi\sigma^2}}\mathrm{exp}\left[-\frac{(x(0)-\theta)^2}{2 \sigma^2}\right]
+            \end{equation}
+            须指出，$p(\bm{x};\bm{\theta})$的分号表示该PDF是依赖于给定向量$\bm{\theta}$的一族PDF曲线。而$p(\bm{x},\bm{\theta})$中的逗号表示这是一个联合概率密度函数，联合的随机变量用逗号分隔。
+        \end{example}
+
+        \begin{example}{服从正态分布的多变量均值估计概率模型}{服从正态分布的多变量均值估计概率模型}
+            现收集有某地连续$N$天的道琼斯(\emph{Dow-Jones})工业平均指数的数据$x(0),\,x(1),\,\cdots,\,x(N-1)$，数据整体随时间呈上升趋势，但细节仍有较大起伏。求该地区道琼斯工业平均指数服从的PDF。
+            \tcbsubtitle{解：}
+            \setlength{\parindent}{2\ccwd}
+            我们用直线和高斯白噪声(White Gaussian Noise, WGN)拟合数据，设
+            \begin{equation}\label{Equ: 含有加性白噪声的随机信号}
+                x(n)=\theta_1+\theta_2n+w(n) \;\quad n=0,1,\cdots,N-1
+            \end{equation}
+            从经典估计的角度来看，直线$\theta_1+\theta_2n$是时域一条确定的直线，每个数据点都是在这条定直线的基础上加一个零均值、方差为$\sigma^2$的随机数得到，换言之，每个样本点中随机的成分是正态随机变量$w(n)$的实现。而从贝叶斯估计的角度，由于参数是随机变量，每次对随机信号的观测都对应一条不同的直线，每一个样本点应当视作是$\theta_1,\theta_2,w(n)$的共同实现。
+
+            须指出，模型如\hyperref[Equ: 含有加性白噪声的随机信号]{式(\ref*{Equ: 含有加性白噪声的随机信号})}不依赖于估计方法，这是为了贴合实际问题作出的人为假设。不同估计方法造成的差异体现在PDF的推导上。
+
+            对于这种含有加性白噪声的数字信号模型，通常%\footnote[2]{认为时域的每一次采样都是独立的？}把
+            随机信号看作一组联合的随机变量。
+            
+            因此经典估计认为$\bm{x}$服从的PDF为
+            \begin{equation}
+                p(\bm{x};\bm{\theta})=\frac{1}{(2\pi\sigma^2)^{\frac{N}{2}}}\mathrm{exp}\left[-\frac{1}{2\sigma^2}\sum_{n=0}^{N-1}(x(n)-\theta_1-\theta_2n)^2\right]
+            \end{equation}
+            
+            而贝叶斯估计认为$\bm{x}$服从的PDF为
+            \begin{equation}
+                p(\bm{x},\bm{\theta})=p(\bm{x}|\bm{\theta})p(\bm{\theta})
+            \end{equation}
+            其中$p(\bm{\theta})$是先验PDF，表示在数据观测以前关于$\bm{\theta}$的先验知识；$p(\bm{x}|\bm{\theta})$是条件PDF，表示在给定$\bm{\theta}$的前提下由数据$\bm{x}$提供的知识。
+        \end{example}
+
+    \subsection{估计量的性能}
+        已经指出，估计量是样本值的函数：
+        \begin{equation*}
+            \hat{\bm{\theta}}=g(\bm{x})
+        \end{equation*}
+        因此估计量是一个随机变量，它的性能由其PDF完全描述，并且也只能从统计的角度描述。
+
+        通常从以下几个方面考察估计量的性能：
+        \begin{enumerate}
+
+            \item 从估计量与样本数量$n$的关系考虑；
+                
+                估计量的PDF随观测次数的变化的性质需引起重视，因为\uline{这决定了我们增加试验次数是否真的能使估计的结果更准确}——如果是，那么可以适当增加观测数；否则只是在浪费时间。
+                
+                我们用随机变量序列$\hat{\theta}_n$来表示估计量对观测数$n$的依赖关系。例如其中$\hat{\theta}_i$表示用$n=i$个样本来估计真值$\theta$的一个估计量。
+                \begin{definition}{一致估计量}{一致估计量}
+                    给定$n$个观测$\bm{x}_1,\,\bm{x}_2,\,\cdots,\,\bm{x}_n$，估计量$\hat{\theta}_n$是这$n$个观测的函数。若对于真值的所有可能取值$\theta$，$\hat{\theta}_n$都满足依概率收敛于真值，则称该估计量为一致(consistent)估计量（或称为相合估计量）。即
+                    \begin{equation}
+                        \lim_{n \to \infty}{\mathrm{Pr}\left\{|\hat{\theta}_n-\theta|\geqslant\epsilon\right\}=0}
+                    \end{equation}
+                    其中$\epsilon$为任意小的正数。
+                    % 该式表示\emph{估计量$\hat{\theta}$依概率收敛于真值$\theta$}。
+                    \tcblower
+                    “$\hat{\theta}_n$依概率收敛于$\theta$”有时也记作：
+                    \begin{equation}
+                        \mathrm{p}\lim_{n \to \infty}\left(\hat{\theta}_n\right)=\theta
+                    \end{equation}
+                \end{definition}
+                在思考这个概念时，应当把估计量的PDF看做是依赖于$n$的一族曲线，而\emph{一致性(consistency)}则是描述了这一族曲线随着$n\rightarrow\infty$逐渐压缩成一个冲激函数（即收敛于一个具体的数值$\theta$）或者逐渐形成某个特殊分布的形状\footnote[2]{TODO：这是贝叶斯学派的观点，是这样吗？}（即收敛于一个已知参数的随机变量$\theta$）。
+
+
+            \item 从估计量的期望考虑；
+                \begin{definition}{无偏估计量}{无偏估计量}
+                    若对于真值的所有可能取值$\theta$以及任意有限的观测次数$n$，估计量$\hat{\theta}_n$的期望\footnotemark[1]都与之相等，则称该估计量为无偏(Unbiased)估计量。即
+                    \begin{equation}
+                        E\left[\hat{\theta}_n\right]=\theta \;,\quad n=1,2,\cdots
+                    \end{equation}
+                    \tcblower
+                    反之，不满足以上条件的估计量为有偏(Biased)估计量，称其期望与真值的差值为\emph{偏差}（或称偏误），写作
+                    \begin{equation}
+                        \mathrm{b}(\hat{\theta}_n)=E\left[\hat{\theta}_n\right]-\theta
+                    \end{equation}
+                \end{definition}
+                
+                % 无偏是一个很好的性质，但有时为了减小估计量的方差而采用有偏估计量。
+                \footnotetext[1]{TODO：又一说为已知$\theta$的条件期望？}
+
+
+            \item 综合以上1、2考虑：
+                \begin{definition}{渐进无偏估计量}{渐进无偏估计量}
+                    给定$n$个观测$\bm{x}_1,\,\bm{x}_2,\,\cdots,\,\bm{x}_n$，估计量$\hat{\theta}_n$是这$n$个观测的函数。若对于真值的所有可能取值$\theta$，估计量的期望在$n\rightarrow\infty$时收敛于真值，则称该估计量为渐进无偏(asymptotic unbiased)估计量。即
+                    \begin{equation}
+                        \lim_{n \to \infty}{E\left[\hat{\theta}_n\right]]}=\theta
+                    \end{equation}
+                \end{definition}
+                
+                \begin{tcbnote}
+                    无偏、一致、渐进无偏三者的区别和联系。
+                    \begin{itemize}
+                        \item 估计量的无偏性与样本个数$n$无关，它是一个有限样本特性，也称小样本特性。
+                        \item 估计量的渐进无偏性需要在$n\rightarrow\infty$时根据$\mathrm{E}\left[\hat{\theta}\right]$的极限值判断，与一致性一同被称为无限样本特性（或大样本特性）。
+                        \item 若估计量的期望等于真值（无偏性），则其极限必然也为真值（渐进无偏性）。
+                        \item “依概率收敛”是一个相对宽松的条件。估计量依概率收敛于真值（一致性），并不能得出估计量的期望在$n\rightarrow\infty$的极限等于真值（渐进无偏性）！（可以举一个让期望趋于无穷的反例，见《概率导论》P298例5.7）
+                        \item 若估计量的方差满足在$n\rightarrow\infty$的极限为0，且估计量是渐进无偏的，则估计量具有一致性。这是因为“依均方收敛”的条件强于“依概率收敛”。
+                
+                    \end{itemize}
+
+
+                    \begin{center}
+                    \begin{tikzpicture}
+                        \matrix (m)[row sep=6em,column sep=0.5cm,minimum width=1em]
+                        {
+                            \node [label=above:{\color{gray} 无偏性}] (无偏性){$E\left[\hat{\theta}_n\right]=\theta$};& &\node [label=above:{\color{gray} 渐进无偏性}] (渐进无偏性) {$\lim\limits_{n \to \infty}{E\left[\hat{\theta}_n\right]=\theta}$};\\
+                            &\node [label=below:{\color{gray} 一致性}] (一致性){$\mathrm{p}\lim\limits_{n \to \infty}\left(\hat{\theta}_n\right)=\theta$}; &  \\
+                        };
+                    \path[-stealth]
+                        (无偏性) edge [double] node [left] {} (渐进无偏性)
+                        (渐进无偏性) edge [double] node [above,sloped] {\fontsize{6}{7} $\displaystyle \lim_{n \to \infty}{\mathrm{Var}\left[\hat{\theta}_n\right]=0}$} (一致性)
+                        % (一致性) edge [dashed] node [right] {} (渐进无偏性)
+                    ;
+                    \end{tikzpicture}
+                    \end{center}
+                \end{tcbnote}
+
+            \item 从估计量的方差考虑：
+            
+                估计量的方差越小，说明估计结果越稳定；但估计量仍可能是有偏的、也可能不以概率收敛。
+
+
+            \item 从估计量到真值的均方误差考虑：
+                \begin{definition}{估计量的均方误差}{估计量的均方误差}
+                    估计量$\hat{\theta}$到真值$\theta$的均方误差(Mean Square Error, MSE)，记作$\mathrm{mse}\left(\hat{\theta}\right)$，定义为随机变量$(\hat{\theta}-\theta)^2$的期望。即
+                    \begin{equation}
+                        \mathrm{mse}\left(\hat{\theta}\right)=E\left[(\hat{\theta}-\theta)^2\right]
+                    \end{equation}
+                \end{definition}
+
+                均方误差同时考虑到了估计量的偏差和方差所带来的误差。因此能更全面地体现估计量的性能。
+
+        \end{enumerate}
+
+    % \subsection{MVU Estimator 最小方差无偏估计}
+    \subsection{估计量的最小均方误差准则}
+
+        目的：找到用来估计\emph{未知确定性参数}的最佳估计量。
+
+        如何定义“最佳”？我们需要给出一个量化的准则，这里使用的就是\uline{最小均方误差}准则。使估计量到真值的MSE最小的估计量，可以称为最小均方误差(Minimum MSE)估计量，但为什么研究的却是最小方差无偏(Minimum Variance Unbiased, MVU)估计量呢？
+
+        这是因为最小均方误差(MMSE)估计量通常是不可实现的：
+        \begin{equation}
+            \begin{aligned}
+                \mathrm{mse}\left(\hat{\theta}\right)
+                &=E\left\{\left[\left(\hat{\theta}-E(\hat{\theta})\right)+\left(E(\hat{\theta})-\theta\right)\right]^2\right\}\\
+                &=E\left\{\left(\hat{\theta}-E(\hat{\theta})\right)^2\right\}+2E\left\{\hat{\theta}-E(\hat{\theta})\right\}\cdot \mathrm{b}\left(\hat{\theta}\right)+\mathrm{b}^2\left(\hat{\theta}\right)\\
+                &=\mathrm{Var}\left(\hat{\theta}\right)+\mathrm{b}^2\left(\hat{\theta}\right)
+            \end{aligned}
+        \end{equation}
+        这是一个很重要的公式。它说明估计量到真值的MSE是估计量的方差和偏差引起的。在很多统计问题中都存在等式右边两项的权衡——方差的减少总是伴随着偏差的增大。
+
+        但也可以看到，MMSE准则因为引入真值参与运算而使之成为一般不可实现的估计量\footnote[1]{在几种极端情况下是可实现的。见《统计信号处理》P17}，它不能写成只关于样本数据的函数——估计量的偏差还是关于真值的函数。
+
+        为了避免不可实现的估计量，我们约束偏差为零，即在无偏估计的前提下使估计量的方差最小，得到最小方差无偏(MVU)估计量。
+
+        MVU估计量 的MSE就是它的方差，而方差作为一个统计量可以由样本数据得出\footnote[1]{样本方差是方差的无偏估计量。}，因此MUV估计量是可实现的估计量，下面讨论其存在性。
+
+        \subsubsection{MVU估计量的存在性}
+
+            MVU估计量要存在，首先应满足无偏估计量的存在性，然后在所有的无偏估计量中，若对所有可能的真值取值$\theta$，都存在某个无偏估计量的方差始终比其他无偏估计量的方差小，则这个估计量就是MVU估计量。
+
+            你可能会问：估计量的方差为什么会随真值$\theta$取值变化而变化？前面已经提到，观测次数$n$可能会影响估计量的PDF曲线，这是因为估计量的构造和样本数目有关。而事实上参数真值影响了样本的分布，因此估计量的PDF也会随之变化。
+
+        \subsubsection{MVU估计量的求法}
+            目前没有一种总是能得到MVU估计量的“转动摇把”(turn-the-crank)的方法。后面的章节将详细讨论如何在已知存在性时，求出MUV估计量，这里只作为一个引子简单介绍。
+            
+            
+            \begin{enumerate}[label=法\chinese*：,itemjoin=\\\hspace*{\parindent}, leftmargin=1.4cm, rightmargin=2.5cm]
+            % \renewcommand*\labelenumi{法\zhnum{\theenumi}}
+            % \AddEnumerateCounter{\chinese}{\chinese}{}
+                \item 确定 Cramer-Rao 下限(Cramer-Rao lower bound, CRLB)，然后检查估计量是否满足Cramer-Rao下限。
+                \item 应用 Rao-Blackwell-Lehmann-Scheffe(RBLS)定理。
+                \item 进一步限制无偏估计量是线性的，然后找到线性无偏约束下的最小方差估计。
+            \end{enumerate}
+
+    \subsection{Cramer-Rao 下限}
+        我们希望对任何无偏估计量，都能确定其方差的下限。在最理想的情况下，对于未知参数的所有取值，如果某个无偏估计量的方差都达到了此下限，那么它就是MVU估计量。在最恶劣的情况下，即使不存在 MVU估计量 ，它也能为比较无偏估计量的性能提供一个标准。
+
+        Cramer-Rao下限 (CRLB)，由 Harald Cramer 和 Calyampudi Radhakrishna Rao 得名。事实上，历史上的研究者提出了很多种估计量的方差下限，但是 CRLB 是最容易确定的。
+        
+        CRLB 给出了一个确定性参数的无偏估计量的方差下限。它的最简单形式是：任何无偏估计的方差都不小于 Fisher 信息的倒数。一个达到了方差下限的无偏估计被称为完全高效的(fully efficient)。
+
+        给定估计量偏差，CRLB 还可以用于确定有偏估计的界限。在一些情况下，有偏估计的MSE可能小于无偏估计的 CRLB。
+
+
+        \subsubsection{关于参数估计的精度的考虑}
+        前面已经提到，对于某个具体的估计量，它的PDF越集中于真值附近（对于一般估计量来说就是MSE越小，对无偏估计量来说就是方差越小），则估计精度越高。这说的是不同估计量的性能问题，但实际上除了估计量的选取影响了估计精度外，问题的概率模型自身——或者说随机信号的PDF，才是限制估计精度的首要原因。
+
+        例如，如果数据服从的PDF对未知参数的依赖性较弱，或者考虑最极端的情况：PDF根本与未知参数无关，那么我们不可能以任何精度来估计参数。一般而言，PDF受未知参数的影响越大，所得估计越好。下面的例子说明了这一点。
+
+        \begin{example}{比较从不同功率的WGN中估计DC电平的精度}{比较从不同功率的WGN中估计DC电平的精度}
+            设有WGN $w(n)\sim\mathcal{N}(0,\sigma^2)$。随机信号建模为一个未知但确定的DC量$A$与WGN的叠加。现每次观测单个样本：
+            \begin{equation*}
+                x(0)=A+w(0)
+            \end{equation*}
+            提出$A$的一个无偏估计量$\hat{A}$，比较当$\sigma^2$分别取值$\sigma_1^2$和$\sigma_2^2$时（$\sigma_1^2<\sigma_2^2$），估计量$\hat{A}$的精度。如何量化这种“精度”？
+            \tcbsubtitle{解：}
+            \setlength{\parindent}{2\ccwd}
+            \begin{equation*}
+                 E\left[x(0)\right]=A+E\left[w(0)\right]=A
+            \end{equation*}
+            因此$\hat{A}=x(0)$是无偏估计量。
+            
+            为了比较随机信号PDF对$\hat{A}$的估计精度的影响，先写出PDF：
+            \begin{equation*}
+                p_i(x(0);A)=\frac{1}{\sqrt{2\pi\sigma_i^2}}\mathrm{exp}\left[-\frac{1}{2\sigma_i^2}\left(x(0)-A\right)^2\right] \quad i=1,2
+            \end{equation*}
+            该式既是估计量$\hat{A}$的PDF，也是随机信号的PDF，它们都依赖于真值$A$。
+            
+            从该式看出，当$\sigma^2$取值越大，$A$对PDF的影响越不明显。极端情况当$\sigma\rightarrow\infty$时，PDF几乎与$A$无关。
+
+            下面引入\emph{似然函数}的概念，以便于定量说明该问题。
+            如果$x(0)$给出，把PDF看作是关于$A$的函数，就得到了{似然函数}，如下图\hyperref[Fig: 不同噪声功率下未知参数的似然函数]{图\ref*{Fig: 不同噪声功率下未知参数的似然函数}}所示。
+
+
+            \begin{center}
+                \begin{tikzpicture}[baseline, scale=0.7]
+                    \begin{axis}[
+                    width=8cm,
+                    axis lines=left,
+                    % scaled ticks=false,
+                    yticklabel pos=upper,
+                    ymin=0,ymax=1.4,
+                    xmin=-0.5,xmax=6.5,
+                    xticklabel style={
+                    rotate=45,
+                    anchor=north east,
+                    },
+                    xtick={(\MU-3*\SIGMA),\MU,(\MU+3*\SIGMA)},
+                    xticklabels={$x(0)-3\sigma_1$,$x(0)$,$x(0)+3\sigma_1$},
+                    axis y line=middle,
+                    % xlabel={$\hat{A}$},
+                    ]
+                    % density of Normal distribution:
+                    \newcommand\MU{3}
+                    \newcommand\SIGMA{(1/3)}
+                    % \addplot [red,domain=\MU-3*\SIGMA:\MU+3*\SIGMA,samples=201]
+                    \addplot [orange,domain=0:6,samples=201]
+                    {exp(-(x-\MU)^2 / 2 / \SIGMA^2)/ (\SIGMA * sqrt(2*pi))};
+                    \legend{$\sigma_1^2=\frac 19$}
+                    \end{axis}
+                    \node at (7cm,0) {\scriptsize $A$};
+                    \node at (1.8,5.4) {\scriptsize $p_1(x(0);A)$};
+                \end{tikzpicture}
+                \hspace*{20pt}
+                \begin{tikzpicture}[baseline, scale=0.7]
+                    \begin{axis}[
+                    width=8cm,
+                    axis lines=left,
+                    yticklabel pos=upper,
+                    ymin=0,ymax=1.4,
+                    xmin=-0.5,xmax=6.5,
+                    xticklabel style={
+                    rotate=45,
+                    anchor=north east,
+                    },
+                    xtick={(\MU-3*\SIGMA),\MU,(\MU+3*\SIGMA)},
+                    xticklabels={$x(0)-3\sigma_2$,$x(0)$,$x(0)+3\sigma_2$},
+                    axis y line=middle,
+                    % xlabel={$\hat{A}$},
+                    ]
+                    % density of Normal distribution:
+                    \newcommand\MU{3}
+                    \newcommand\SIGMA{1}
+                    \addplot [red,domain=\MU-3*\SIGMA:\MU+3*\SIGMA,samples=201]
+                    {exp(-(x-\MU)^2 / 2 / \SIGMA^2) / (\SIGMA * sqrt(2*pi))};
+                    \legend{$\sigma_2^2=1$}
+                    \end{axis}
+                    \node at (7cm,0) {\scriptsize $A$};
+                    \node at (1.8,5.4) {\scriptsize $p_2(x(0);A)$};
+                \end{tikzpicture}                
+            \end{center}
+
+            \begin{wrapfigure}[1]{r}{\textwidth}
+                \vspace{-20pt}
+                \caption{\kaishu 不同噪声功率下未知参数的似然函数}\label{Fig: 不同噪声功率下未知参数的似然函数}
+            \end{wrapfigure}
+            ~\\
+
+            直观地看，似然函数的“尖锐程度”体现了我们估计未知参数的精度。而“尖锐程度”可由函数的曲率刻画。因此提出用函数曲率来表示估计精度。
+
+            考察\emph{对数似然函数}的曲率——即似然函数的{\color{red!80!black} 对数}的二阶{\color{red!80!black} 负}导数：
+            \begin{equation}
+                -\frac{\partial^2\ln p(x(0);A)}{\partial A^2}=-\frac{\partial }{\partial A}\left[\frac{1}{\sigma^2}\left(x(0)-A\right)\right]=\frac{1}{\sigma^2}
+            \end{equation}
+            该式说明正态分布曲线在极值点处的曲率等于方差的倒数。因此方差越大，曲率越小，曲线越平缓，估计的精度越差。
+
+            在这个例子中，曲率只和方差有关，与观测值无关，这只是因为在PDF中两者是分离的，但一般来说对数似然函数的曲率也是关于样本$x(n)$的函数——也就是说，似然函数是样本的随机变量函数，并且依赖于未知参数，所以它的对数的曲率也一般是关于样本和参数的函数。
+
+            因此我们先对$p(x(0);A)$取期望，使它仅为$A$的函数。得到 对数似然函数曲率 更一般的度量：
+            \begin{equation}
+                -E\left[\frac{\partial^2\ln p(x(0);A)}{\partial A^2}\right]
+            \end{equation}
+
+            在这个例子中，估计量的方差
+            \begin{equation*}
+                \mathrm{Var}\left[\hat{A}\right]=\sigma^2=
+                \dfrac{1}{-E\left[\dfrac{\partial^2\ln p(x(0);A)}{\partial A^2}\right]}
+            \end{equation*}
+            验证了“对数似然函数曲率越大，估计精度越高”的结论。
+        \end{example}
+
+        \subsubsection{CRLB定理}
+
+        有\hyperref[exam:比较从不同功率的WGN中估计DC电平的精度]{例\ref*{exam:比较从不同功率的WGN中估计DC电平的精度}}的铺垫，我们已经知道了\underline{无偏估计量的方差与对数似然函数曲率有关}，而CRLB定理正是从原理上证明在一定条件下了方差和曲率的不等关系——后者的倒数是前者的Cramer-Rao下限。
+        
+        \begin{theorem}{标量参数的CRLB定理}{标量参数的CRLB定理}
+            若PDF $p(\bm{\mathrm{x}};\theta)$满足正则条件：对于所有可能的$\theta$，有
+            \begin{equation}
+                E\left[\frac{\partial \ln p(\bm{\mathrm{x}};\theta)}{\partial \theta}\right]=0
+            \end{equation}
+            则任何无偏估计量$\hat{\theta}$的方差必定满足：
+            \begin{equation}
+                \mathrm{Var}\left[\hat{\theta}\right]
+                \geqslant
+                \dfrac{1}{-E\left[\dfrac{\partial^2\ln p(\bm{\mathrm{x}};A)}{\partial A^2}\right]}
+            \end{equation}
+            其中期望是对$p(\bm{\mathrm{x}};\theta)$求的，偏导数是在真值处求取的。
+
+            而且，对于某个函数$g$和$I$，当且仅当
+            \begin{equation}
+                \frac{\partial \ln p(\bm{\mathrm{x}};\theta)}{\partial \theta}=I(\theta)(g(\bm{\mathrm{x}})-\theta)
+            \end{equation}
+            时，存在MVU估计量$\hat{\theta}=g(\bm{\mathrm{x}})$，对于所有可能的真值取值，都能达到方差下限$\dfrac{1}{I(\theta)}$。
+        \end{theorem}

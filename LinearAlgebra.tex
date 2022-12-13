@@ -1,0 +1,135 @@
+\chapter{线性代数}
+
+\section{矩阵空间}
+    \subsection{Subspace 子空间}
+        对于空间$\mathbb{R}^3$，认为：
+        \begin{itemize}
+            \item 任何过原点的平面是$\mathbb{R}^3$的子空间；
+            \item 任何过原点的直线是$\mathbb{R}^3$的子空间；
+            \item $\mathbb{R}^3$中的两个子空间的并集不能构成子空间；
+            \item $\mathbb{R}^3$中的两个子空间的交集可以构成子空间——零空间。
+        \end{itemize}
+        
+        考虑矩阵$\bm{A}$
+        \begin{equation*}
+            \bm{A}=\begin{bmatrix}      
+                1&1&2\\    
+                2&1&3\\    
+                3&1&4\\    
+                4&1&5
+            \end{bmatrix}
+        \end{equation*}
+        则矩阵$\bm{A}$的列空间是$\mathbb{R}^4$的二维子空间。
+        因为$\bm{A}$的列的线性组合表示了$\mathbb{R}^4$中某个过原点的平面。
+    \subsection{Colummspace 列空间}
+        由线性无关的$n$个$m$维列向量组成矩阵$\bm{A}$，可以把$\bm{A}$看做是由这些向量为基所张成的空间。$\bm{A}\bm{x}$就是把这些向量按特定的权重（列向量$\bm{x}$）组合起来，得到的在这个列空间内的向量。
+
+        这给认识“方程$\bm{A}\bm{x}=\bm{b}$无解”提供了一个新的角度：因为$\bm{b}$不落在$\bm{A}$的列空间中。所以无法找到一个基的组合，使组合与$\bm{b}$重合，但仍可以与$\bm{b}$近似——即组合$\bm{A}\bm{x}$是$\bm{b}$向矩阵$\bm{A}$的列空间做的投影，此时一般认为$\bm{A}\bm{x}$最接近$\bm{b}$。这是就是最小二乘法的本质——投影的目的，实际上是使向量$\bm{b}$到空间$\mathrm{C}(\bm{A})$的欧式距离最短。\footnote[1]{以$\bm{b}\in \mathbb{R}^{3\times 1},A\in \mathbb{R}^{3\times 2}$为例，则表示平面外一点到平面的最短距离是过该点作到平面的垂线段的长度。}
+
+        若设该投影向量为$\bm{p}$，则可知方程$\bm{A}\bm{x}=\bm{p}$有唯一解，$\bm{p}$与$\bm{b}$的误差向量即$\bm{e}=\bm{A}\bm{x}-\bm{b}$。$\bm{e}$垂直于$\mathrm{C}(\bm{A})$，或者说：\textbf{$\bm{e}$位于$\bm{A}$的左零空间}。
+
+        利用向量垂直，可以得到使$\left\Vert \bm{e}\right\Vert_2$最小的近似解，记作$\hat{\bm{x}}$。
+        {\color{gray}
+        \begin{equation}
+            {\bm{p}^\mathrm{T}\bm{e}=0}
+        \end{equation}
+        {因而得到}
+        \begin{equation*}
+            {(\bm{A}\hat{\bm{x}})^{\mathrm{T}}(\bm{A}\hat{\bm{x}}-\bm{b})=0}
+        \end{equation*}
+        发现，用$\bm{p}\perp \bm{e}$会使方程中含有两个$\bm{x}$而不易于求解。}
+        注意到$\bm{A}$的每一列都应当与$\bm{e}$垂直，因此有
+        \begin{equation}
+            \bm{A}^{\mathrm{T}}(\bm{A}\hat{\bm{x}}-\bm{b})=\bm{0}
+        \end{equation}
+        这里，由于$\bm{A}$列满秩，所以方阵$\bm{A}^{\mathrm{T}}A$满秩、可逆，因此解为
+        \begin{equation}
+            \hat{\bm{x}}=(\bm{A}^{\mathrm{T}}\bm{A})^{-1}\bm{A}^{\mathrm{T}} \bm{b}
+        \end{equation}
+        至此，问题似乎已经解决：我们\underline{只需一些矩阵乘法和求逆，即可得出原非齐次超定方程的最小二乘解}。
+
+        但是，还有一些值得研究的问题，例如：是否有一种特定形式的矩阵，可以作为一种变换，把原来的$\bm{b}$向量投影到$\mathrm{C}(\bm{A})$上？
+        这个把$\bm{b}$投影为$\bm{p}$的矩阵，和$\bm{A}$的关系表示为：
+        \vspace{0.8cm}
+        \begin{equation}
+            \bm{p}
+            =\bm{A}\hat{\bm{x}}
+            =\tikzmarknode{ProjMat}{\highlight{red}{$\bm{A}(\bm{A}^{\mathrm{T}}\bm{A})^{-1}\bm{A}^{\mathrm{T}}$}} \bm{b}
+        \end{equation}
+        \begin{tikzpicture}[overlay,remember picture,>=stealth,nodes={align=left,inner ysep=1pt},<-]
+        \path (ProjMat.north) ++ (0,1.5em) node[anchor=south west,color=red!67] (annotation1){\textbf{投影矩阵}$\bm{P}$};
+        \draw [color=red!57](ProjMat.north) |- ([xshift=-0.3ex,color=red]annotation1.south east);
+        \end{tikzpicture}
+
+        易发现，投影矩阵$\bm{P}$有以下性质：（证明方法直接代入其表达式即可）
+        \begin{enumerate}
+            \item 是对称方阵。$\bm{P}^{\mathrm{T}}=\bm{P}$
+            \item “可折叠”。$\bm{P}^k=\bm{P}\quad(k\in \mathbb{N}^+)$，其直观解释：对于已经在$\mathrm{C}(\bm{A})$上的向量，再次作投影，不发生任何改变。
+            \item 降秩。$\bm{P}\in \mathbb{R}^{m\times m}$，但其秩不超过$R(A)=n<m$。
+            \item 有固定的特征值0和1。因为：
+                \begin{equation}
+                    \bm{P}\bm{x}=
+                    \left\{\begin{aligned}
+                        \bm{x}\;,\quad \bm{x}\in \mathrm{C}(\bm{A})\\
+                        0\;,\quad \bm{x}\perp \mathrm{C}(\bm{A})
+                    \end{aligned}\right.
+                \end{equation}
+        \end{enumerate}
+
+
+    \subsection{Overdetermined Homogeneous Linear System}
+        对于过定齐次方程组
+        \begin{equation}
+            [\bm{A}]_{m\times n}\bm{x}=\bm{0} \quad(m> n)
+        \end{equation}
+        它倾向于只有唯一零解，因为此时$\bm{A}$通常是非奇异（或列满秩）的。
+
+        我们希望得到一个不平凡解(\emph{non-trivial} solution)$\hat{\bm{x}}$，要求$\hat{\bm{x}}\neq \bm{0}$但使$\bm{A}\bm{x}$几近于$\bm{0}$。
+
+        这个目标可以建模为如下形式：
+        \begin{equation}
+            \begin{aligned}
+                \arg \mathop{\min}_{\bm{x}} \left\Vert \bm{A}\bm{x}\right\Vert_2\\
+                \mathrm{s.t.}\; \left\Vert \bm{x}\right\Vert_2=1
+            \end{aligned}
+        \end{equation}
+
+        这个问题有封闭解：$\hat{\bm{x}}$为$\bm{A}^{\mathrm{T}}\bm{A}$最小特征值对应的特征向量；或者说是$\bm{A}$的最小奇异值对应的奇异向量。
+
+\section{方阵的特征值与特征向量}
+
+        特征值/特征向量的一个重要思想，在于它处理的是这样一种特殊情况——以方阵列为基和以坐标轴（单位阵的列）为基，分别按特征向量加权后组合出的两个向量是平行的——比值为$\lambda$。
+        即
+        \begin{equation}
+            \bm{A}\bm{x}=\lambda \bm{x}
+        \end{equation}
+        %一旦有上式成立
+        特别指出，特征向量不能为零向量。
+
+        给定任意一个方阵，我们希望得出其特征值/特征向量，就需要解上式矩阵方程——但是未知量有两个，已知量只有$\bm{A}$，怎么办呢？
+
+        我们知道，非奇异矩阵的零空间只有零向量。因此把上式整理为关于$\bm{x}$的齐次线性方程组，要使得
+        \begin{equation*}
+            (\bm{A}-\lambda \bm{I})\bm{x}=\bm{0}
+        \end{equation*}
+        存在非零解，那么$(\bm{A}-\lambda \bm{I})$只能是奇异矩阵。
+
+        因此
+        \begin{equation}
+            \left\vert \bm{A}-\lambda \bm{I}\right\vert=0
+        \end{equation}
+        该式被称为特征方程(\emph{eigenvalue equation})。显然，它是关于$\lambda$的一元$n$次方程。
+
+        好消息是这意味着$n$阶方阵有且仅有$n$个特征值，坏消息是，特征值可能很难求——五次及以上的方程没有根式解。
+
+        \fbox{零空间的求法：对矩阵A进行消元求得主变量和自由变量；给自由变量赋值得到特解；对特解进行线性组合得到零空间。} 
+
+
+\section{奇异值分解}
+        矩阵的奇异值分解(\emph{sigular value decomposition})将是最重要的矩阵分解方式。
+
+        \begin{itemize}
+            \item 矩阵是实对称方阵：特征向量正交
+            \item 矩阵是共轭对称方阵(\emph{Hermitian Matrix})：特征值为实数，且特征向量正交
+            \item 
+        \end{itemize}
